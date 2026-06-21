@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,9 +34,6 @@ import com.kqlite.demo.contacts.utils.fullName
 import com.kqlite.demo.contacts.utils.initials
 import com.kqlite.demo.contacts.utils.testContacts
 import com.kqlite.demo.contacts.utils.toDate
-import kqlitecontacts.shared.generated.resources.Res
-import kqlitecontacts.shared.generated.resources.rounded_contacts_product_24
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun ContactItem(
@@ -58,7 +58,7 @@ fun ContactItem(
             // Avatar
             if (contact.image != null) {
                 AsyncImage(
-                    placeholder = painterResource(Res.drawable.rounded_contacts_product_24),
+                    placeholder = rememberVectorPainter(Icons.Default.Person),
                     model = contact.image,
                     contentDescription = contact.fullName(),
                     modifier = Modifier
