@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.kqlite.demo.contacts.model.Contact
 import com.kqlite.demo.contacts.model.ContactType
+import com.kqlite.demo.contacts.utils.toInstant
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -115,7 +116,7 @@ fun AddContactScreen(
                                     errors.add("Birth date must be in YYYY-MM-DD format.")
                                 } else {
                                     try {
-                                        parsedBirthDate = Instant.parse(birthDate + "T00:00:00Z")
+                                        parsedBirthDate = birthDate.toInstant()
                                     } catch (_: Exception) {
                                         errors.add("Invalid birth date.")
                                     }

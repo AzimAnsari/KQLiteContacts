@@ -33,7 +33,7 @@ import com.kqlite.demo.contacts.model.Contact
 import com.kqlite.demo.contacts.utils.fullName
 import com.kqlite.demo.contacts.utils.initials
 import com.kqlite.demo.contacts.utils.testContacts
-import com.kqlite.demo.contacts.utils.toDate
+import com.kqlite.demo.contacts.utils.toDateString
 
 @Composable
 fun ContactItem(
@@ -114,7 +114,7 @@ fun ContactItem(
 
                 contact.birthDate?.let {
                     Text(
-                        text = it.toDate(),
+                        text = it.toDateString(),
                         style = MaterialTheme.typography.labelSmall
                     )
                 }

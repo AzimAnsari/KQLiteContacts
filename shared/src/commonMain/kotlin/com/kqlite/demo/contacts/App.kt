@@ -13,21 +13,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kqlite.demo.contacts.db.ContactsDatabase
 import com.kqlite.demo.contacts.ui.AddContactScreen
 import com.kqlite.demo.contacts.ui.ContactListScreen
 import com.kqlite.demo.contacts.utils.fullName
-import com.kqlite.demo.contacts.utils.testContacts
+import com.kqlite.demo.contacts.viewmodel.ContactsViewModel
 
 @Preview
 @Composable
 fun App() {
     val navController = rememberNavController()
+    val database = remember { ContactsDatabase() }
+    val contactsViewModel: ContactsViewModel = viewModel { ContactsViewModel(database) }
 
     NavHost(navController = navController, startDestination = "contact_list") {
         composable("contact_list") {
@@ -53,7 +58,7 @@ fun App() {
                     modifier = Modifier.padding(innerPadding),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    ContactListScreen(testContacts()) {
+                    ContactListScreen(contactsViewModel) {
                         println("Clicked on ${it.fullName()}")
                     }
                 }
@@ -62,7 +67,8 @@ fun App() {
         composable("add_contact") {
             AddContactScreen(
                 onSave = {
-                    // TODO: Save contact
+                    val id = contactsViewModel.insertContact(it)
+                    println("Inserted Contact ID: $id")
                     navController.popBackStack()
                 },
                 onCancel = {
