@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kqlite.demo.contacts.model.ContactType
 
@@ -35,5 +36,37 @@ fun ContactTypeChip(type: ContactType) {
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Medium
         )
+    }
+}
+
+@Preview
+@Composable
+fun ContactTypeChipFamilyPreview() {
+    MaterialTheme {
+        ContactTypeChip(ContactType.Family)
+    }
+}
+
+@Preview
+@Composable
+fun ContactTypeChipFriendPreview() {
+    MaterialTheme {
+        ContactTypeChip(ContactType.Friend)
+    }
+}
+
+@Preview
+@Composable
+fun ContactTypeChipWorkPreview() {
+    MaterialTheme {
+        ContactTypeChip(ContactType.Work)
+    }
+}
+
+@Preview
+@Composable
+fun ContactTypeChipOtherPreview() {
+    MaterialTheme {
+        ContactTypeChip(ContactType.Other)
     }
 }

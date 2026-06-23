@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kqlite.demo.contacts.model.Contact
 import com.kqlite.demo.contacts.model.ContactType
@@ -103,7 +104,8 @@ fun AddContactScreen(
                             }
 
                             if (email.isNotBlank()) {
-                                val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+                                val emailRegex =
+                                    "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
                                 if (!emailRegex.matches(email)) {
                                     errors.add("Please enter a valid email address.")
                                 }
@@ -287,4 +289,13 @@ fun AddContactScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun AddContactScreenPreview() {
+    AddContactScreen(
+        onSave = {},
+        onCancel = {}
+    )
 }
