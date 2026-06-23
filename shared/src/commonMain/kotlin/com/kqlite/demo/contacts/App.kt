@@ -67,8 +67,10 @@ fun App() {
         composable("add_contact") {
             AddContactScreen(
                 onSave = {
-                    val id = contactsViewModel.insertContact(it)
-                    println("Inserted Contact ID: $id")
+                    database.withTransaction {
+                        val id = contactsViewModel.insertContact(it)
+                        println("Inserted Contact ID: $id")
+                    }
                     navController.popBackStack()
                 },
                 onCancel = {

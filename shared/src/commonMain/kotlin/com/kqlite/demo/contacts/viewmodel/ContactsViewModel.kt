@@ -11,7 +11,6 @@ import com.kqlite.flow.asCallbackFlow
 import com.kqlite.statement.insert
 import com.kqlite.statement.select
 import com.kqlite.statement.update
-import com.kqlite.table.Action
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -32,28 +31,32 @@ class ContactsViewModel(private val database: ContactsDatabase) : ViewModel() {
         selectActiveContacts()
             .asCallbackFlow()
             .mapToList {
+                println("mapToList: $it")
                 TblContact.mapper(it)
             }
             .map { ContactUiState.Success(it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ContactUiState.Loading)
 
     fun selectActiveContacts(): KQLiteCursor {
-        return TblContact
+        val c = TblContact
             .select()
             .where { it.deleted NOT_EQ true }
             .execute()
+        println("selectActiveContacts: $c")
+        return c
     }
 
     fun insertContact(contact: Contact): Int {
         return TblContact
-            .insert()
-            .bind { it.binder(this, contact) }
-            .executeReturning(TblContact.id)
+            .insert().use {
+                it.bind { TblContact.binder(this, contact) }
+                    .executeReturning(TblContact.id)
+            }
     }
 
     fun updateContact(contact: Contact) {
         TblContact
-            .update(onConflict = Action.REPLACE) { it.binder(this, contact) }
+            .update { it.binder(this, contact) }
             .where { it.id EQ contact.id }
             .execute()
     }
