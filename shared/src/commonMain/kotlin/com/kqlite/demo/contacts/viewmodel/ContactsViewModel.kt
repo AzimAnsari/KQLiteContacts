@@ -2,16 +2,8 @@ package com.kqlite.demo.contacts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kqlite.cursor.KQLiteCursor
-import com.kqlite.cursor.mapToList
-import com.kqlite.demo.contacts.db.ContactsDatabase
-import com.kqlite.demo.contacts.db.TblContact
+import com.kqlite.demo.contacts.delight.DelightDatabaseHelper
 import com.kqlite.demo.contacts.model.Contact
-import com.kqlite.flow.asCallbackFlow
-import com.kqlite.statement.insert
-import com.kqlite.statement.select
-import com.kqlite.statement.update
-import com.kqlite.table.Action
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -22,13 +14,14 @@ sealed interface ContactUiState {
     data class Success(val contacts: List<Contact>) : ContactUiState
 }
 
-class ContactsViewModel(private val database: ContactsDatabase) : ViewModel() {
-
-    init {
-        database.open()
-    }
+class ContactsViewModel(private val helper: DelightDatabaseHelper) : ViewModel() {
 
     val uiState: StateFlow<ContactUiState> =
+        helper.selectContactsAsFlow()
+            .map { ContactUiState.Success(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ContactUiState.Loading)
+
+    /*val uiState: StateFlow<ContactUiState> =
         selectActiveContacts()
             .asCallbackFlow()
             .mapToList {
@@ -63,9 +56,9 @@ class ContactsViewModel(private val database: ContactsDatabase) : ViewModel() {
             .update { it.deleted.bind(true) }
             .where { it.id EQ id }
             .execute()
-    }
+    }*/
 
-    override fun onCleared() {
-        database.close()
+    fun insertContact(contact: Contact): Long {
+        return helper.insertContact(contact)
     }
 }

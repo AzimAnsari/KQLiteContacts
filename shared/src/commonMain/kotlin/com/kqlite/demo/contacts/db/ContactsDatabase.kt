@@ -1,5 +1,6 @@
 package com.kqlite.demo.contacts.db
 
+/*
 import androidx.sqlite.driver.bundled.SQLITE_OPEN_READONLY
 import com.kqlite.database.KQLiteDatabase
 import com.kqlite.demo.contacts.platform.getDatabaseAbsolutePath
@@ -21,4 +22,4 @@ class ContactsDatabase : KQLiteDatabase(
     }
 
     fun openReadOnly() = this.open(SQLITE_OPEN_READONLY)
-}
+}*/

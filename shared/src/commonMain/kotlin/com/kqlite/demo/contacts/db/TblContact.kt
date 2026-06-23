@@ -1,5 +1,6 @@
 package com.kqlite.demo.contacts.db
 
+/*
 import com.kqlite.column.Bind
 import com.kqlite.column.CURRENT_TIMESTAMP
 import com.kqlite.column.notNull
@@ -56,4 +57,4 @@ object TblContact : KQLiteTable("contacts"), KQLiteAdapter<Contact> {
             deleted = cursor[deleted]
         )
     }
-}
+}*/

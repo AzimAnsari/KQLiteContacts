@@ -1,5 +1,6 @@
 package com.kqlite.demo.contacts.db
 
+/*
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.SQLiteStatement
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
@@ -24,4 +25,4 @@ class LoggingConnection(private val connection: SQLiteConnection) : SQLiteConnec
         connection.close()
     }
 
-}
+}*/
