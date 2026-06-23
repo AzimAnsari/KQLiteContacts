@@ -46,7 +46,7 @@ object TblContact : KQLiteTable("contacts"), KQLiteAdapter<Contact> {
             id = cursor[id],
             firstName = cursor[firstName],
             lastName = cursor[lastName],
-            phone = cursor[phone].getText().trim('[', ']').split(','),
+            phone = cursor[phone].getText().trim('[', ']').split(',').map { it.trim('"', '"') },
             birthDate = cursor[birthDate]?.getText()?.toInstant(),
 //            createdTime = cursor[createdTime].getText().toInstant(),
             createdTime = Clock.System.now(),

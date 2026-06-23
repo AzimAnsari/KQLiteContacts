@@ -1,5 +1,6 @@
 package com.kqlite.demo.contacts.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,8 +61,8 @@ fun ContactList(
         }
     } else {
         LazyColumn(
-            modifier = modifier,
-            contentPadding = PaddingValues(vertical = 8.dp)
+            modifier = modifier.background(Color.White),
+            contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp),
         ) {
             items(contacts, key = { it.id }) { contact ->
                 ContactItem(contact = contact, onClick = { onClick(contact) })
