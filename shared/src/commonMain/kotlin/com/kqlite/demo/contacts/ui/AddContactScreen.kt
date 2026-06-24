@@ -1,6 +1,7 @@
 package com.kqlite.demo.contacts.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kqlite.demo.contacts.model.Contact
@@ -59,17 +61,21 @@ fun AddContactScreen(
     onDelete: (Contact) -> Unit = {},
     onCancel: () -> Unit
 ) {
+    val faceIcons = remember { StaticIcons().staticFaces() }
+
     var firstName by remember { mutableStateOf(contact?.firstName ?: "") }
     var lastName by remember { mutableStateOf(contact?.lastName ?: "") }
     var email by remember { mutableStateOf(contact?.email ?: "") }
     var birthDate by remember { mutableStateOf(contact?.birthDate?.toDateString() ?: "") }
     var phones by remember { mutableStateOf(contact?.phone ?: listOf("")) }
     var selectedType by remember { mutableStateOf(contact?.type ?: ContactType.Other) }
+    var image by remember { mutableStateOf(contact?.image?.decodeToString()) }
 
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
     var showDeleteConfirmation by remember { mutableStateOf(false) }
+    var showIconPicker by remember { mutableStateOf(false) }
 
     if (showErrorDialog) {
         AlertDialog(
@@ -100,6 +106,64 @@ fun AddContactScreen(
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirmation = false }) {
                     Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showIconPicker) {
+        AlertDialog(
+            onDismissRequest = { showIconPicker = false },
+            title = { Text("Select Contact Icon") },
+            text = {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    faceIcons.forEach { icon ->
+                        Box(
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (image == icon.name)
+                                        MaterialTheme.colorScheme.primaryContainer
+                                    else
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                )
+                                .clickable {
+                                    image = icon.name
+                                    showIconPicker = false
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = icon.name,
+                                modifier = Modifier.size(40.dp),
+                                tint = if (image == icon.name)
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showIconPicker = false }) {
+                    Text("Cancel")
+                }
+            },
+            dismissButton = {
+                if (image != null) {
+                    TextButton(onClick = {
+                        image = null
+                        showIconPicker = false
+                    }) {
+                        Text("Remove Image", color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         )
@@ -172,7 +236,7 @@ fun AddContactScreen(
                                         phone = filledPhones.map { it.trim() },
                                         email = email.trimOrNull(),
                                         birthDate = parsedBirthDate,
-                                        image = contact?.image,
+                                        image = image?.encodeToByteArray(),
                                         type = selectedType
                                     )
                                 )
@@ -194,28 +258,50 @@ fun AddContactScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Avatar Placeholder
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                if (firstName.isBlank()) {
+            val icon = image?.let { img -> faceIcons.firstOrNull { it.name == img } }
+            if (icon != null) {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .clickable { showIconPicker = true },
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
-                        imageVector = Icons.Default.Person,
+                        imageVector = icon,
                         contentDescription = null,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(64.dp),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                } else {
-                    Text(
-                        text = firstName.trim().first().uppercase() +
-                                (lastName.trim().firstOrNull()?.uppercase() ?: ""),
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .clickable { showIconPicker = true },
+                    contentAlignment = Alignment.Center
+                ) {
+                    val firstInitial = firstName.trim().firstOrNull()?.uppercaseChar()
+                    val lastInitial = lastName.trim().firstOrNull()?.uppercaseChar()
+
+                    if (firstInitial != null || lastInitial != null) {
+                        Text(
+                            text = "${firstInitial ?: ""}${lastInitial ?: ""}",
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
                 }
             }
 

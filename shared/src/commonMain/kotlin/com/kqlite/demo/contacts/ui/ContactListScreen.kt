@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,12 +61,16 @@ fun ContactList(
             )
         }
     } else {
+        val faceIcons = remember { StaticIcons().staticFaces() }
         LazyColumn(
             modifier = modifier.background(Color.White),
             contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp),
         ) {
             items(contacts, key = { it.id }) { contact ->
-                ContactItem(contact = contact, onClick = { onClick(contact) })
+                ContactItem(
+                    faceIcons = faceIcons,
+                    contact = contact,
+                    onClick = { onClick(contact) })
             }
         }
     }

@@ -14,22 +14,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.SentimentSatisfied
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.kqlite.demo.contacts.model.Contact
 import com.kqlite.demo.contacts.model.ContactType
 import com.kqlite.demo.contacts.utils.fullName
@@ -39,9 +42,12 @@ import kotlin.time.Clock
 
 @Composable
 fun ContactItem(
+    faceIcons: List<ImageVector>,
     contact: Contact,
     onClick: () -> Unit
 ) {
+    var image by remember { mutableStateOf(contact.image?.decodeToString()) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,17 +64,22 @@ fun ContactItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // Avatar
-            if (contact.image != null) {
-                AsyncImage(
-                    placeholder = rememberVectorPainter(Icons.Default.Person),
-                    model = contact.image,
-                    contentDescription = contact.fullName(),
+            val icon = image?.let { img -> faceIcons.firstOrNull { it.name == img } }
+            if (icon != null) {
+                Box(
                     modifier = Modifier
                         .size(58.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(38.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
             } else {
                 // Placeholder
                 Box(
@@ -133,6 +144,7 @@ fun ContactItem(
 fun ContactItemPreview() {
     MaterialTheme {
         ContactItem(
+            faceIcons = StaticIcons().staticFaces(),
             Contact(
                 id = 1,
                 firstName = "John",
@@ -140,11 +152,10 @@ fun ContactItemPreview() {
                 phone = listOf("+911234567890", "+919876543210"),
                 birthDate = Clock.System.now(),
                 email = "john.doe@example.com",
-                image = null,
+                image = Icons.Filled.SentimentSatisfied.name.encodeToByteArray(),
                 type = ContactType.Friend,
             )
         ) {
-
         }
     }
 }
