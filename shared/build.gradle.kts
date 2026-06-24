@@ -29,14 +29,21 @@ kotlin {
             jvmTarget = JvmTarget.JVM_11
         }
         androidResources {
-            enable = true
+            enable = false
         }
         withHostTest {
-            isIncludeAndroidResources = true
+            isIncludeAndroidResources = false
         }
     }
 
     sourceSets {
+        val jvmTest by getting {
+            dependencies {
+                implementation(compose.desktop.uiTestJUnit4)
+                implementation(compose.desktop.currentOs)
+                implementation(libs.mockk)
+            }
+        }
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.koin.android)
@@ -58,6 +65,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

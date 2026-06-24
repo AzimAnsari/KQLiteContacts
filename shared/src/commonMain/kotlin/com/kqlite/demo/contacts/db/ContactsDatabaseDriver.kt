@@ -1,16 +1,17 @@
 package com.kqlite.demo.contacts.db
 
 import androidx.sqlite.SQLiteConnection
+import androidx.sqlite.SQLiteDriver
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.kqlite.database.KQLiteDriver
 
-class ContactsDatabaseDriver : KQLiteDriver {
-    private val driver = BundledSQLiteDriver()
+class ContactsDatabaseDriver(private val sqLiteDriver: SQLiteDriver) : KQLiteDriver {
     override fun open(file: String, flags: Int?): SQLiteConnection {
-        val connection = flags?.let {
-            driver.open(file, it)
-        } ?: driver.open(file)
-
+        val connection = if (flags != null && sqLiteDriver is BundledSQLiteDriver) {
+            sqLiteDriver.open(file, flags)
+        } else {
+            sqLiteDriver.open(file)
+        }
         return connection
     }
 }

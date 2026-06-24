@@ -1,14 +1,20 @@
 package com.kqlite.demo.contacts.db
 
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.driver.bundled.SQLITE_OPEN_READONLY
 import com.kqlite.database.KQLiteDatabase
+import com.kqlite.database.KQLiteDriver
 import com.kqlite.demo.contacts.platform.getDatabaseAbsolutePath
 import com.kqlite.table.KQLiteTable
 
-class ContactsDatabase : KQLiteDatabase(
-    file = getDatabaseAbsolutePath(NAME),
-    version = VERSION,
-    kqLiteDriver = ContactsDatabaseDriver()
+class ContactsDatabase(
+    file: String = getDatabaseAbsolutePath(NAME),
+    version: Int = VERSION,
+    kqLiteDriver: KQLiteDriver = ContactsDatabaseDriver(sqLiteDriver = BundledSQLiteDriver())
+) : KQLiteDatabase(
+    file = file,
+    version = version,
+    kqLiteDriver = kqLiteDriver
 ) {
 
     companion object {

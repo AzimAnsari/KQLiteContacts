@@ -30,18 +30,38 @@ fun ContactListScreen(
     onClick: (Contact) -> Unit
 ) {
     val uiState by contactsViewModel.uiState.collectAsStateWithLifecycle()
+    ContactListContent(
+        uiState = uiState,
+        onClick = onClick,
+        modifier = Modifier.fillMaxSize()
+    )
+}
 
-    when (val state = uiState) {
+@Composable
+fun ContactListContent(
+    uiState: ContactUiState,
+    onClick: (Contact) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (uiState) {
         is ContactUiState.Success -> {
             ContactList(
-                contacts = state.contacts,
+                contacts = uiState.contacts,
                 onClick = onClick,
-                modifier = Modifier.fillMaxSize()
+                modifier = modifier
             )
         }
 
         ContactUiState.Loading -> {
-            // Loading state can be handled here
+            Box(
+                modifier = modifier,
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Loading contacts...",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
         }
     }
 }
