@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face2
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -99,7 +101,7 @@ fun PreviewContactList() {
                     phone = listOf("+911234567890", "+919876543210"),
                     birthDate = Clock.System.now(),
                     email = "jane.moe@example.com",
-                    image = null,
+                    image = Icons.Filled.Face2.name.encodeToByteArray(),
                     type = com.kqlite.demo.contacts.model.ContactType.Family
                 )
             ),
