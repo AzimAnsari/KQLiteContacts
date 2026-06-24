@@ -31,10 +31,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.kqlite.demo.contacts.model.Contact
+import com.kqlite.demo.contacts.model.ContactType
 import com.kqlite.demo.contacts.utils.fullName
 import com.kqlite.demo.contacts.utils.initials
-import com.kqlite.demo.contacts.utils.testContacts
 import com.kqlite.demo.contacts.utils.toDateString
+import kotlin.time.Clock
 
 @Composable
 fun ContactItem(
@@ -131,7 +132,18 @@ fun ContactItem(
 @Composable
 fun ContactItemPreview() {
     MaterialTheme {
-        ContactItem(testContacts().first()) {
+        ContactItem(
+            Contact(
+                id = 1,
+                firstName = "John",
+                lastName = "Doe",
+                phone = listOf("+911234567890", "+919876543210"),
+                birthDate = Clock.System.now(),
+                email = "john.doe@example.com",
+                image = null,
+                type = ContactType.Friend,
+            )
+        ) {
 
         }
     }

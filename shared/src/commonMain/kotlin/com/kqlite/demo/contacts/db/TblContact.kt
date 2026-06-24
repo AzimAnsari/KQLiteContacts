@@ -1,7 +1,6 @@
 package com.kqlite.demo.contacts.db
 
 import com.kqlite.column.Bind
-import com.kqlite.column.CURRENT_TIMESTAMP
 import com.kqlite.column.notNull
 import com.kqlite.cursor.KQLiteCursor
 import com.kqlite.demo.contacts.model.Contact
@@ -12,7 +11,6 @@ import com.kqlite.functions.DATE
 import com.kqlite.functions.JSON_ARRAY
 import com.kqlite.table.KQLiteAdapter
 import com.kqlite.table.KQLiteTable
-import kotlin.time.Clock
 
 object TblContact : KQLiteTable("contacts"), KQLiteAdapter<Contact> {
     val id = intColumn("id").notNull().primaryKey().autoIncrement()
@@ -20,8 +18,7 @@ object TblContact : KQLiteTable("contacts"), KQLiteAdapter<Contact> {
     val lastName = textColumn("last_name")
     val phone = jsonArrayColumn("phone").notNull()
     val birthDate = dateColumn("birth_date")
-    val createdTime = dateTimeColumn("created_time").notNull().default(CURRENT_TIMESTAMP)
-    val email = textColumn("email")
+    val email = textColumn("email").check { (it IS null) OR (it LIKE "%_@__%.__%") }
     val image = blobColumn("image")
     val type = enumColumn("type", ContactType.entries).notNull()
     val deleted = booleanColumn("deleted").notNull().default(false)
@@ -34,7 +31,8 @@ object TblContact : KQLiteTable("contacts"), KQLiteAdapter<Contact> {
             firstName.bind(item.firstName)
             lastName.bind(item.lastName)
             phone.bind(JSON_ARRAY(*item.phone.toTypedArray()))
-            birthDate.bind(DATE(item.birthDate?.toDateString()))
+            if (item.birthDate != null) birthDate.bind(DATE(item.birthDate.toDateString()))
+            else birthDate.bind(null)
             email.bind(item.email)
             image.bind(item.image)
             type.bind(item.type)
@@ -48,8 +46,6 @@ object TblContact : KQLiteTable("contacts"), KQLiteAdapter<Contact> {
             lastName = cursor[lastName],
             phone = cursor[phone].getText().trim('[', ']').split(',').map { it.trim('"', '"') },
             birthDate = cursor[birthDate]?.getText()?.toInstant(),
-//            createdTime = cursor[createdTime].getText().toInstant(),
-            createdTime = Clock.System.now(),
             email = cursor[email],
             image = cursor[image],
             type = cursor[type],

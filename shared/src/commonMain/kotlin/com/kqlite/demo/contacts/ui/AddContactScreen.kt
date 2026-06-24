@@ -47,24 +47,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kqlite.demo.contacts.model.Contact
 import com.kqlite.demo.contacts.model.ContactType
+import com.kqlite.demo.contacts.utils.toDateString
 import com.kqlite.demo.contacts.utils.toInstant
-import kotlin.time.Clock
+import com.kqlite.demo.contacts.utils.trimOrNull
 import kotlin.time.Instant
 
 @Composable
 fun AddContactScreen(
+    contact: Contact?,
     onSave: (Contact) -> Unit,
+    onDelete: (Contact) -> Unit = {},
     onCancel: () -> Unit
 ) {
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var birthDate by remember { mutableStateOf("") }
-    var phones by remember { mutableStateOf(listOf("")) }
-    var selectedType by remember { mutableStateOf(ContactType.Other) }
+    var firstName by remember { mutableStateOf(contact?.firstName ?: "") }
+    var lastName by remember { mutableStateOf(contact?.lastName ?: "") }
+    var email by remember { mutableStateOf(contact?.email ?: "") }
+    var birthDate by remember { mutableStateOf(contact?.birthDate?.toDateString() ?: "") }
+    var phones by remember { mutableStateOf(contact?.phone ?: listOf("")) }
+    var selectedType by remember { mutableStateOf(contact?.type ?: ContactType.Other) }
 
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
 
     if (showErrorDialog) {
         AlertDialog(
@@ -79,16 +84,46 @@ fun AddContactScreen(
         )
     }
 
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text("Delete Contact") },
+            text = { Text("Are you sure you want to delete this contact?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteConfirmation = false
+                    contact?.let { onDelete(it) }
+                }) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Contact") },
+                title = { Text(if (contact == null) "Add Contact" else "Edit Contact") },
                 navigationIcon = {
                     IconButton(onClick = onCancel) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
+                    if (contact != null) {
+                        IconButton(onClick = { showDeleteConfirmation = true }) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete Contact",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                     TextButton(
                         onClick = {
                             val errors = mutableListOf<String>()
@@ -131,14 +166,13 @@ fun AddContactScreen(
                             } else {
                                 onSave(
                                     Contact(
-                                        id = -1,
-                                        firstName = firstName,
-                                        lastName = lastName,
-                                        phone = filledPhones,
-                                        email = email.takeIf { it.isNotBlank() },
+                                        id = contact?.id ?: -1,
+                                        firstName = firstName.trim(),
+                                        lastName = lastName.trimOrNull(),
+                                        phone = filledPhones.map { it.trim() },
+                                        email = email.trimOrNull(),
                                         birthDate = parsedBirthDate,
-                                        createdTime = Clock.System.now(),
-                                        image = null,
+                                        image = contact?.image,
                                         type = selectedType
                                     )
                                 )
@@ -177,7 +211,8 @@ fun AddContactScreen(
                     )
                 } else {
                     Text(
-                        text = firstName.take(1).uppercase(),
+                        text = firstName.trim().first().uppercase() +
+                                (lastName.trim().firstOrNull()?.uppercase() ?: ""),
                         style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -295,6 +330,7 @@ fun AddContactScreen(
 @Composable
 fun AddContactScreenPreview() {
     AddContactScreen(
+        contact = null,
         onSave = {},
         onCancel = {}
     )

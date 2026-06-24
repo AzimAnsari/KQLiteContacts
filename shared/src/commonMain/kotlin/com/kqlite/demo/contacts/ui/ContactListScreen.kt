@@ -17,9 +17,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kqlite.demo.contacts.model.Contact
-import com.kqlite.demo.contacts.utils.testContacts
 import com.kqlite.demo.contacts.viewmodel.ContactUiState
 import com.kqlite.demo.contacts.viewmodel.ContactsViewModel
+import kotlin.time.Clock
 
 @Composable
 fun ContactListScreen(
@@ -74,23 +74,30 @@ fun ContactList(
 @Preview
 @Composable
 fun PreviewContactList() {
-    val contacts = testContacts()
-
     MaterialTheme {
         ContactList(
-            contacts = contacts,
-            onClick = {},
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Preview
-@Composable
-fun PreviewEmptyContactList() {
-    MaterialTheme {
-        ContactList(
-            contacts = emptyList(),
+            contacts = listOf(
+                Contact(
+                    id = 1,
+                    firstName = "John",
+                    lastName = "Doe",
+                    phone = listOf("+911234567890", "+919876543210"),
+                    birthDate = null,
+                    email = "john.doe@example.com",
+                    image = null,
+                    type = com.kqlite.demo.contacts.model.ContactType.Friend
+                ),
+                Contact(
+                    id = 2,
+                    firstName = "Jane",
+                    lastName = "Moe",
+                    phone = listOf("+911234567890", "+919876543210"),
+                    birthDate = Clock.System.now(),
+                    email = "jane.moe@example.com",
+                    image = null,
+                    type = com.kqlite.demo.contacts.model.ContactType.Family
+                )
+            ),
             onClick = {},
             modifier = Modifier.fillMaxSize()
         )

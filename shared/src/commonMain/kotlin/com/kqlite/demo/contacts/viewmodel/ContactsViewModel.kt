@@ -67,21 +67,34 @@ class ContactsViewModel(
         }
     }
 
-    fun updateContact(contact: Contact) {
+    fun updateContact(
+        contact: Contact,
+        onResult: (Int) -> Unit
+    ) {
         viewModelScope.launch(ioDispatcher) {
             TblContact
                 .update { it.binder(this, contact) }
                 .where { it.id EQ contact.id }
                 .execute()
+
+            val changes = database.sqliteChanges()
+            withContext(Dispatchers.Main) {
+                onResult(changes)
+            }
         }
     }
 
-    fun deleteContact(id: Int) {
+    fun deleteContact(id: Int, onResult: (Int) -> Unit) {
         viewModelScope.launch(ioDispatcher) {
             TblContact
                 .update { it.deleted.bind(true) }
                 .where { it.id EQ id }
                 .execute()
+
+            val changes = database.sqliteChanges()
+            withContext(Dispatchers.Main) {
+                onResult(changes)
+            }
         }
     }
 }
