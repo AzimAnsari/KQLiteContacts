@@ -31,6 +31,7 @@ import com.kqlite.demo.contacts.db.ContactsDatabase
 import com.kqlite.demo.contacts.model.Contact
 import com.kqlite.demo.contacts.ui.AddContactScreen
 import com.kqlite.demo.contacts.ui.ContactListScreen
+import com.kqlite.demo.contacts.ui.TrashScreen
 import com.kqlite.demo.contacts.utils.fullName
 import com.kqlite.demo.contacts.viewmodel.ContactsViewModel
 
@@ -54,7 +55,7 @@ fun App() {
                             Text("KQLite Contacts")
                         },
                         actions = {
-                            IconButton(onClick = { }) {
+                            IconButton(onClick = { navController.navigate("trash") }) {
                                 Icon(
                                     Icons.Filled.RestoreFromTrash,
                                     contentDescription = "Recover Contact",
@@ -85,6 +86,11 @@ fun App() {
         }
         composable("update_contact") {
             OpenContactScreen(contactsViewModel, navController, selectedContact)
+        }
+        composable("trash") {
+            TrashScreen(contactsViewModel) {
+                navController.popBackStack()
+            }
         }
     }
 }

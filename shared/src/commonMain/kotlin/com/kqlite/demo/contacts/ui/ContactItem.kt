@@ -105,7 +105,9 @@ fun ContactItem(
                 Text(
                     text = contact.fullName(),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (contact.deleted) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurface
                 )
 
                 contact.phone.forEach {

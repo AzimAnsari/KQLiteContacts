@@ -50,6 +50,14 @@ class ContactsViewModel(
                 .map { ContactUiState.Success(it) }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ContactUiState.Loading)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val trashUiState: StateFlow<ContactUiState> =
+        selectDeletedContacts()
+            .asCallbackFlow()
+            .mapToList(ioDispatcher) { TblContact.mapper(it) }
+            .map { ContactUiState.Success(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ContactUiState.Loading)
+
     private fun selectActiveContacts(query: String): KQLiteCursor =
         TblContact
             .select()
@@ -66,6 +74,12 @@ class ContactsViewModel(
                     it.deleted NOT_EQ true
                 }
             }
+            .execute()
+
+    private fun selectDeletedContacts(): KQLiteCursor =
+        TblContact
+            .select()
+            .where { it.deleted EQ true }
             .execute()
 
     fun onSearchQueryChange(query: String) {
@@ -112,6 +126,20 @@ class ContactsViewModel(
         viewModelScope.launch(ioDispatcher) {
             TblContact
                 .update { it.deleted.bind(true) }
+                .where { it.id EQ id }
+                .execute()
+
+            val changes = database.sqliteChanges()
+            withContext(Dispatchers.Main) {
+                onResult(changes)
+            }
+        }
+    }
+
+    fun restoreContact(id: Int, onResult: (Int) -> Unit) {
+        viewModelScope.launch(ioDispatcher) {
+            TblContact
+                .update { it.deleted.bind(false) }
                 .where { it.id EQ id }
                 .execute()
 
