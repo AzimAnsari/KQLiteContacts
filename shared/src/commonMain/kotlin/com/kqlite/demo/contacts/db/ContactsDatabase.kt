@@ -8,14 +8,12 @@ import com.kqlite.demo.contacts.platform.getDatabaseAbsolutePath
 import com.kqlite.table.KQLiteTable
 
 class ContactsDatabase(
-    file: String = getDatabaseAbsolutePath(NAME),
-    version: Int = VERSION,
-    kqLiteDriver: KQLiteDriver = ContactsDatabaseDriver(sqLiteDriver = BundledSQLiteDriver())
-) : KQLiteDatabase(
-    file = file,
-    version = version,
-    kqLiteDriver = kqLiteDriver
-) {
+    kqLiteDriver: KQLiteDriver = ContactsDatabaseDriver(
+        dbFile = getDatabaseAbsolutePath(NAME),
+        version = VERSION,
+        sqLiteDriver = BundledSQLiteDriver()
+    )
+) : KQLiteDatabase(kqLiteDriver) {
 
     companion object {
         private const val NAME = "contacts.db"

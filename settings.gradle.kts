@@ -25,8 +25,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-//        maven("https://central.sonatype.com/repository/maven-snapshots/")
-        mavenLocal()
+        maven("https://central.sonatype.com/repository/maven-snapshots/")
     }
 }
 
