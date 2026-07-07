@@ -1,13 +1,22 @@
 package com.kqlite.demo.contacts.viewmodel
 
 import com.kqlite.demo.contacts.db.ContactsDatabase
+import com.kqlite.demo.contacts.db.ContactsDatabaseDriver
 import com.kqlite.demo.contacts.model.Contact
 import com.kqlite.demo.contacts.model.ContactType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.*
-import kotlin.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ContactsViewModelTest {
@@ -19,7 +28,7 @@ class ContactsViewModelTest {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        database = ContactsDatabase(":memory:")
+        database = ContactsDatabase(ContactsDatabaseDriver(":memory:"))
         viewModel = ContactsViewModel(database, testDispatcher)
     }
 
@@ -57,8 +66,9 @@ class ContactsViewModelTest {
         advanceUntilIdle()
 
         assertTrue(insertedId > 0)
-        
-        val uiState = viewModel.uiState.first { it is ContactUiState.Success && it.contacts.isNotEmpty() }
+
+        val uiState =
+            viewModel.uiState.first { it is ContactUiState.Success && it.contacts.isNotEmpty() }
         val successState = uiState as ContactUiState.Success
         assertEquals(1, successState.contacts.size)
         assertEquals("John", successState.contacts[0].firstName)
@@ -92,7 +102,8 @@ class ContactsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, changes)
-        val uiState = viewModel.uiState.first { it is ContactUiState.Success && it.contacts.any { c -> c.firstName == "Jane" } }
+        val uiState =
+            viewModel.uiState.first { it is ContactUiState.Success && it.contacts.any { c -> c.firstName == "Jane" } }
         val successState = uiState as ContactUiState.Success
         assertEquals("Jane", successState.contacts.find { it.id == insertedId }?.firstName)
     }
@@ -123,7 +134,8 @@ class ContactsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, changes)
-        val uiState = viewModel.uiState.first { it is ContactUiState.Success && it.contacts.isEmpty() }
+        val uiState =
+            viewModel.uiState.first { it is ContactUiState.Success && it.contacts.isEmpty() }
         val successState = uiState as ContactUiState.Success
         assertTrue(successState.contacts.none { it.id == insertedId })
     }
