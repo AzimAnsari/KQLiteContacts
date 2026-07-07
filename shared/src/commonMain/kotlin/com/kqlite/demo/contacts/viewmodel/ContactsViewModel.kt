@@ -14,15 +14,20 @@ import com.kqlite.statement.update
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 sealed interface ContactUiState {
     data object Loading : ContactUiState
@@ -41,14 +46,14 @@ class ContactsViewModel(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val uiState: StateFlow<ContactUiState> =
-        _searchQuery.flatMapLatest { query ->
-            selectActiveContacts(query)
-                .asCallbackFlow()
-                .mapToList(ioDispatcher) { TblContact.mapper(it) }
-                .map { ContactUiState.Success(it) }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ContactUiState.Loading)
+        _searchQuery
+            .debounce(300.milliseconds)
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                selectActiveContacts(query).map { ContactUiState.Success(it) }
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ContactUiState.Loading)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val trashUiState: StateFlow<ContactUiState> =
@@ -58,7 +63,7 @@ class ContactsViewModel(
             .map { ContactUiState.Success(it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ContactUiState.Loading)
 
-    private fun selectActiveContacts(query: String): KQLiteCursor =
+    private fun selectActiveContacts(query: String): Flow<List<Contact>> =
         TblContact
             .select()
             .where {
@@ -75,6 +80,8 @@ class ContactsViewModel(
                 }
             }
             .execute()
+            .asCallbackFlow()
+            .mapToList(ioDispatcher) { TblContact.mapper(it) }
 
     private fun selectDeletedContacts(): KQLiteCursor =
         TblContact
