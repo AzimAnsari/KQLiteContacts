@@ -4,6 +4,7 @@ import androidx.sqlite.driver.bundled.SQLITE_OPEN_READONLY
 import com.kqlite.database.KQLiteDatabase
 import com.kqlite.database.KQLiteDriver
 import com.kqlite.demo.contacts.platform.getDatabaseAbsolutePath
+import com.kqlite.migration.KQLiteMigration
 import com.kqlite.table.KQLiteTable
 
 class ContactsDatabase(
@@ -12,11 +13,15 @@ class ContactsDatabase(
 
     companion object {
         const val NAME = "contacts.db"
-        const val VERSION = 1
+        const val VERSION = 2
     }
 
     override fun getKQLiteTables(): List<KQLiteTable> {
         return listOf(TblContact)
+    }
+
+    override fun getKQLiteMigrations(): List<KQLiteMigration> {
+        return listOf(Migration12())
     }
 
     fun openReadOnly() = this.open(SQLITE_OPEN_READONLY)

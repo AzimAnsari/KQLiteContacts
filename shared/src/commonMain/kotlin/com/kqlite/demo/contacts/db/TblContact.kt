@@ -1,6 +1,7 @@
 package com.kqlite.demo.contacts.db
 
 import com.kqlite.column.Bind
+import com.kqlite.column.CURRENT_TIMESTAMP
 import com.kqlite.column.notNull
 import com.kqlite.cursor.KQLiteCursor
 import com.kqlite.demo.contacts.model.Contact
@@ -22,6 +23,7 @@ object TblContact : KQLiteTable("contacts"), KQLiteAdapter<Contact> {
     val image = blobColumn("image")
     val type = enumColumn("type", ContactType.entries).notNull()
     val deleted = booleanColumn("deleted").notNull().default(false)
+    val lastModified = dateTimeColumn("last_modified")
 
     override fun binder(
         bind: Bind,
@@ -36,6 +38,7 @@ object TblContact : KQLiteTable("contacts"), KQLiteAdapter<Contact> {
             email.bind(item.email)
             image.bind(item.image)
             type.bind(item.type)
+            lastModified.bind(CURRENT_TIMESTAMP)
         }
     }
 
