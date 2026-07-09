@@ -1,4 +1,4 @@
-# KQLite official demo
+# KQLite official sample
 
 KQLite is a Lightweight, Kotlin Multiplatform DSL to write typesafe SQL queries.
 It allows you to write SQL queries using a Kotlin object-style DSL instead of raw SQL strings.
@@ -12,7 +12,7 @@ It allows you to write SQL queries using a Kotlin object-style DSL instead of ra
 ```kotlin
 sourceSets {
     commonMain.dependencies {
-        implementation("com.kqlite:kqlite:0.2.0")
+        implementation("com.kqlite:kqlite:0.2.1")
     }
 }
 ```
